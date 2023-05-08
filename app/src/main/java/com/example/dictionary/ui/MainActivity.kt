@@ -1,72 +1,74 @@
 package com.example.dictionary.ui
 
-import android.content.ContentValues
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dictionary.R
 import com.example.dictionary.app
 import com.example.dictionary.databinding.ActivityMainBinding
 import com.example.dictionary.model.data.TranslationListEntityItem
-import com.example.dictionary.model.source.GivTranslationListRepo
+import com.example.dictionary.presenter.DictionaryContract
+import com.example.dictionary.presenter.DictionaryPresenter
 import com.example.dictionary.ui.adapter.TranslationListAdapter
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DictionaryContract.View {
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapterTranslationList: TranslationListAdapter
-    private val givTranslationListRepo: GivTranslationListRepo by lazy { app.givTranslationListRepo }
     private var querySearchWord: String = ""
+    private lateinit var presenter: DictionaryContract.Presenter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        presenter = DictionaryPresenter(app.givTranslationListRepo)
+        (presenter as DictionaryPresenter).attach(this)
+        showProgress(true)
         init()
+    }
+
+    override fun onDestroy() {
+        presenter.detach()
+        super.onDestroy()
     }
 
     private fun init() {
         clickOnSearch()
-
     }
 
     private fun clickOnSearch() {
 
         binding.mainActivityImageButtonSearch.setOnClickListener {
             querySearchWord = binding.mainActivityEditTextEnterWord.text.toString()
-            initViewTranslationList(querySearchWord)
+            presenter.onRefresh(querySearchWord)
+            initViewTranslationList()
         }
     }
 
-    private fun initViewTranslationList(querySearchWord: String) {
+    private fun initViewTranslationList() {
         binding.apply {
             mainActivityListTranslatorRecyclerView.layoutManager = LinearLayoutManager(
                 this@MainActivity, LinearLayoutManager.VERTICAL, false
             )
             adapterTranslationList = TranslationListAdapter(listOf())
             mainActivityListTranslatorRecyclerView.adapter = adapterTranslationList
-            givTranslationListRepo.getTranslationList(
-                query = querySearchWord,
-                onSuccess = ::getListTranslation,
-                onError = ::loadingError
-            )
+
         }
     }
 
-    private fun getListTranslation(result: List<TranslationListEntityItem>) {
+    override fun getListTranslation(result: List<TranslationListEntityItem>) {
         adapterTranslationList.addWordTranslation(result)
         showProgress(true)
     }
 
-    private fun loadingError(throwable: Throwable) {
+    override fun loadingError(throwable: Throwable) {
         Toast.makeText(this@MainActivity, "$throwable", Toast.LENGTH_LONG).show()
-        Log.d(ContentValues.TAG, "ОШИБКА: $throwable")
         showProgress(false)
 
     }
 
-    private fun showProgress(inProgress: Boolean) {
+    override fun showProgress(inProgress: Boolean) {
         binding.mainLoadUsersProgressBar.isVisible = inProgress
         binding.mainLoadUsersProgressBar.isVisible = !inProgress
     }
