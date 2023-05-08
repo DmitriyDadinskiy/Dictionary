@@ -22,10 +22,16 @@ class MainActivity : AppCompatActivity(), DictionaryContract.View {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        presenter = DictionaryPresenter(app.givTranslationListRepo)
-        (presenter as DictionaryPresenter).attach(this)
-        showProgress(true)
         init()
+        showProgress(true)
+
+        presenter = extractPresenter()
+        (presenter as DictionaryPresenter).attach(this)
+    }
+
+    private fun extractPresenter(): DictionaryContract.Presenter {
+        return lastCustomNonConfigurationInstance as? DictionaryContract.Presenter
+            ?: DictionaryPresenter(app.givTranslationListRepo)
     }
 
     override fun onDestroy() {
@@ -33,17 +39,13 @@ class MainActivity : AppCompatActivity(), DictionaryContract.View {
         super.onDestroy()
     }
 
-    private fun init() {
-        clickOnSearch()
+    override fun onRetainCustomNonConfigurationInstance(): Any? {
+        return presenter
     }
 
-    private fun clickOnSearch() {
-
-        binding.mainActivityImageButtonSearch.setOnClickListener {
-            querySearchWord = binding.mainActivityEditTextEnterWord.text.toString()
-            presenter.onRefresh(querySearchWord)
-            initViewTranslationList()
-        }
+    private fun init() {
+        initViewTranslationList()
+        clickOnSearch()
     }
 
     private fun initViewTranslationList() {
@@ -56,6 +58,16 @@ class MainActivity : AppCompatActivity(), DictionaryContract.View {
 
         }
     }
+
+    private fun clickOnSearch() {
+
+        binding.mainActivityImageButtonSearch.setOnClickListener {
+            querySearchWord = binding.mainActivityEditTextEnterWord.text.toString()
+            presenter.onRefresh(querySearchWord)
+
+        }
+    }
+
 
     override fun getListTranslation(result: List<TranslationListEntityItem>) {
         adapterTranslationList.addWordTranslation(result)
