@@ -25,17 +25,44 @@
 
 
         <TextView
+            android:id="@+id/item_word_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/word" />
+
+        <TextView
             android:id="@+id/item_translation_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:alpha="0.6"
             tools:text="@string/translation" />
 
-        <TextView
-            android:id="@+id/item_transcription_textView"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.6"
-            tools:text="@string/transcription" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/item_square_bracket_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.6"
+                android:text="[" />
+
+            <TextView
+                android:id="@+id/item_transcription_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                tools:text="@string/transcription" />
+
+            <TextView
+                android:id="@+id/item_square_bracket2_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.6"
+                android:text="]" />
+        </LinearLayout>
 
     </LinearLayout>
 
