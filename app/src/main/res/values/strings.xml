@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Dictionary</string>
+    <string name="enter_word">Введите слово</string>
+    <string name="translation">Перевод</string>
+    <string name="transcription">Траснскрипция</string>
+    <string name="word">Слово</string>
+    <string name="enter_the_word_to_translate">Впишите слово для перевода</string>
 </resources>
